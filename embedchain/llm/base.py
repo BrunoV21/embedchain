@@ -12,6 +12,7 @@ from embedchain.helpers.json_serializable import JSONSerializable
 from embedchain.memory.base import ChatHistory
 from embedchain.memory.message import ChatMessage
 
+import tiktoken
 
 class BaseLlm(JSONSerializable):
     def __init__(self, config: Optional[BaseLlmConfig] = None):
@@ -29,6 +30,13 @@ class BaseLlm(JSONSerializable):
         self.is_docs_site_instance = False
         self.online = False
         self.history: Any = None
+        
+
+    def num_tokens_from_string(self, string: str, encoding_name='cl100k_base') -> int:
+        """Returns the number of tokens in a text string."""
+        encoding = tiktoken.get_encoding(encoding_name)
+        num_tokens = len(encoding.encode(string))
+        return num_tokens
 
     def get_llm_model_answer(self):
         """
@@ -213,9 +221,13 @@ class BaseLlm(JSONSerializable):
                 return prompt
 
             answer = self.get_answer_from_llm(prompt)
+            tokens_dict = {
+                        'input': self.num_tokens_from_string(prompt),
+                        'output': self.num_tokens_from_string(answer)
+                       }
             if isinstance(answer, str):
                 logging.info(f"Answer: {answer}")
-                return answer
+                return answer, tokens_dict
             else:
                 return self._stream_response(answer)
         finally:

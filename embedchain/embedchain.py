@@ -554,7 +554,7 @@ class EmbedChain(JSONSerializable):
                 dry_run=dry_run,
             )
         else:
-            answer = self.llm.query(
+            answer, tokens_dict = self.llm.query(
                 input_query=input_query, contexts=contexts_data_for_llm_query, config=config, dry_run=dry_run
             )
 
@@ -562,9 +562,9 @@ class EmbedChain(JSONSerializable):
         self.telemetry.capture(event_name="query", properties=self._telemetry_props)
 
         if citations:
-            return answer, contexts
+            return answer, contexts, tokens_dict
         else:
-            return answer
+            return answer, tokens_dict
 
     def chat(
         self,
