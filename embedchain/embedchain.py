@@ -533,6 +533,7 @@ class EmbedChain(JSONSerializable):
         or the dry run result
         :rtype: str, if citations is False, otherwise tuple[str, list[tuple[str,str,str]]]
         """
+        #print(input_query,'1stocc\n\n\n')
         contexts = self._retrieve_from_database(
             input_query=input_query, config=config, where=where, citations=citations, **kwargs
         )
@@ -540,7 +541,8 @@ class EmbedChain(JSONSerializable):
             contexts_data_for_llm_query = list(map(lambda x: x[0], contexts))
         else:
             contexts_data_for_llm_query = contexts
-
+        print(contexts)
+        print('HEREEEE\n\n\n\n')
         if self.cache_config is not None:
             logging.info("Cache enabled. Checking cache...")
             answer = adapt(

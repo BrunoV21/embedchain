@@ -117,6 +117,8 @@ class BaseLlm(JSONSerializable):
         else:
             # basic use case, no history.
             prompt = self.config.prompt.substitute(context=context_string, query=input_query)
+            print('\n\n\nprompt')
+            print(prompt)
         return prompt
 
     @staticmethod
@@ -219,8 +221,9 @@ class BaseLlm(JSONSerializable):
             logging.info(f"Prompt: {prompt}")
             if dry_run:
                 return prompt
-
+            #print('\n\n\n',prompt, '\n\n\n')
             answer = self.get_answer_from_llm(prompt)
+            #print('\n\n\n',answer, '\n\n\n')
             tokens_dict = {
                         'input': self.num_tokens_from_string(prompt),
                         'output': self.num_tokens_from_string(answer)

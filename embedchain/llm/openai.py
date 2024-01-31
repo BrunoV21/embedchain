@@ -56,5 +56,4 @@ class OpenAILlm(BaseLlm):
                 }
             )
             messages.append(AIMessage(content=json.dumps(fn_res)))
-
         return chat(messages).content

@@ -102,6 +102,43 @@ def clean_string(text):
     return cleaned_text
 
 
+special_chars_dict = {
+                      '` ': u'\u0300',
+                      '´ ': u'\u0301',
+                      'ˆ ': u'\u0302',
+                      '˜ ': u'\u0303'
+                     }
+
+class fix_encoding(object):
+    def __init__(self, text, special_chars_dict=special_chars_dict):
+        self.special_chars_dict = special_chars_dict
+        self.text = list(text)
+        self.content = self.remove_breaklines(self.loop_through_all())
+        
+    def loop_through_all(self):
+        for i in range(len(self.text)-1):
+            self.fix_c_ç(i)
+            self.fix_special_chars(i)
+            
+        return ''.join(self.text)
+            
+    def fix_c_ç(self, i):
+        if ''.join(self.text[i:i+3]) == '¸ c':
+            self.text[i] = 'ç'
+            self.text = self.text[:i+1] + self.text[i+3:]
+
+    def fix_special_chars(self, i):
+        if not self.special_chars_dict:
+            return 
+        elif ''.join(self.text[i:i+2]) in self.special_chars_dict.keys():
+            self.text[i+2] += self.special_chars_dict[''.join(self.text[i:i+2]) ]
+            self.text = self.text[:i] + self.text[i+2:]
+            
+    def remove_breaklines(self,text):
+        pattern = r'\n|\r|\r\n'
+        return re.sub(pattern, ' ', text)
+
+
 def is_readable(s):
     """
     Heuristic to determine if a string is "readable" (mostly contains printable characters and forms meaningful words)

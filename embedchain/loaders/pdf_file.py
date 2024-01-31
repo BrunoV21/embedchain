@@ -8,7 +8,7 @@ except ImportError:
     ) from None
 from embedchain.helpers.json_serializable import register_deserializable
 from embedchain.loaders.base_loader import BaseLoader
-from embedchain.utils.misc import clean_string
+from embedchain.utils.misc import clean_string, fix_encoding
 
 
 @register_deserializable
@@ -24,6 +24,7 @@ class PdfFileLoader(BaseLoader):
         for page in pages:
             content = page.page_content
             content = clean_string(content)
+            content = fix_encoding(content).content
             meta_data = page.metadata
             meta_data["url"] = url
             data.append(

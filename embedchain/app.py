@@ -250,7 +250,6 @@ class App(EmbedChain):
         """
         # Send anonymous telemetry
         self.telemetry.capture(event_name="search", properties=self._telemetry_props)
-
         # TODO: Search will call the endpoint rather than fetching the data from the db itself when deploy=True.
         if self.id is None:
             where = {"app_id": self.local_id}
