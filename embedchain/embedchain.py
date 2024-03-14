@@ -505,6 +505,8 @@ class EmbedChain(JSONSerializable):
     def query(
         self,
         input_query: str,
+        inject_context :Optional[list] = None,
+        default_answer :Optional[str] = 'Provide me with some context first',
         config: BaseLlmConfig = None,
         dry_run=False,
         where: Optional[dict] = None,
@@ -533,7 +535,7 @@ class EmbedChain(JSONSerializable):
         or the dry run result
         :rtype: str, if citations is False, otherwise tuple[str, list[tuple[str,str,str]]]
         """
-        #print(input_query,'1stocc\n\n\n')
+        
         contexts = self._retrieve_from_database(
             input_query=input_query, config=config, where=where, citations=citations, **kwargs
         )
@@ -541,8 +543,15 @@ class EmbedChain(JSONSerializable):
             contexts_data_for_llm_query = list(map(lambda x: x[0], contexts))
         else:
             contexts_data_for_llm_query = contexts
-        print(contexts)
-        print('HEREEEE\n\n\n\n')
+
+        # print('CONTEXTS', contexts_data_for_llm_query,not contexts_data_for_llm_query)
+
+        # print('inject_context', inject_context, not inject_context )
+
+        if not inject_context and not contexts_data_for_llm_query:
+            return default_answer, {}
+
+            
         if self.cache_config is not None:
             logging.info("Cache enabled. Checking cache...")
             answer = adapt(

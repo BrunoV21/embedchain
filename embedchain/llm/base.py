@@ -117,8 +117,8 @@ class BaseLlm(JSONSerializable):
         else:
             # basic use case, no history.
             prompt = self.config.prompt.substitute(context=context_string, query=input_query)
-            print('\n\n\nprompt')
-            print(prompt)
+        print('\n\n\nprompt')
+        print(prompt)
         return prompt
 
     @staticmethod
