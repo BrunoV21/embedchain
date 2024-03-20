@@ -505,7 +505,9 @@ class EmbedChain(JSONSerializable):
     def query(
         self,
         input_query: str,
-        inject_context :Optional[list] = None,
+        prev_retrieved_context :Optional[list] = None,
+        added_context  :Optional[str] = None,
+        inject_context :Optional[bool] = True,
         default_answer :Optional[str] = 'Provide me with some context first',
         config: BaseLlmConfig = None,
         dry_run=False,
@@ -535,22 +537,25 @@ class EmbedChain(JSONSerializable):
         or the dry run result
         :rtype: str, if citations is False, otherwise tuple[str, list[tuple[str,str,str]]]
         """
-        
-        contexts = self._retrieve_from_database(
-            input_query=input_query, config=config, where=where, citations=citations, **kwargs
-        )
-        if citations and len(contexts) > 0 and isinstance(contexts[0], tuple):
-            contexts_data_for_llm_query = list(map(lambda x: x[0], contexts))
+
+        if type(prev_retrieved_context) != list:
+            contexts = self._retrieve_from_database(
+                input_query=input_query, config=config, where=where, citations=citations, **kwargs
+            )
+
+            if citations and len(contexts) > 0 and isinstance(contexts[0], tuple):
+                contexts_data_for_llm_query = list(map(lambda x: x[0], contexts))
+            else:
+                contexts_data_for_llm_query = contexts
+
         else:
-            contexts_data_for_llm_query = contexts
-
-        # print('CONTEXTS', contexts_data_for_llm_query,not contexts_data_for_llm_query)
-
-        # print('inject_context', inject_context, not inject_context )
+            contexts_data_for_llm_query = prev_retrieved_context
 
         if not inject_context and not contexts_data_for_llm_query:
             return default_answer, {}
 
+        if added_context:
+            input_query = added_context + input_query
             
         if self.cache_config is not None:
             logging.info("Cache enabled. Checking cache...")
