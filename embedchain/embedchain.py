@@ -551,7 +551,9 @@ class EmbedChain(JSONSerializable):
         else:
             contexts_data_for_llm_query = prev_retrieved_context
 
-        if not inject_context and not contexts_data_for_llm_query:
+
+
+        if not inject_context and not [context for context in contexts_data_for_llm_query if context]:
             return default_answer, {}
 
         if added_context:
